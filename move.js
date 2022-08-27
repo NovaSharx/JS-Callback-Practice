@@ -1,9 +1,20 @@
+let characterVerticalPosition = 0
+
 function move(element) {
     element.style.position = 'fixed'
 
     function moveToCoordinates(left, bottom) {
         element.style.left = left + 'px'
         element.style.bottom = bottom + 'px'
+
+        setInterval(function imageDepthUpdate() {
+            if (characterVerticalPosition < element.style.bottom) {
+                element.style.zIndex = "-1"
+            }
+            else {
+                element.style.zIndex = "1"
+            }
+        }, 1)
     }
 
     function moveWithArrowKeys(left, bottom, callback) {
@@ -14,21 +25,24 @@ function move(element) {
         element.style.left = x + 'px'
         element.style.bottom = y + 'px'
 
-        setInterval(function () {
-            if (direction === 'west') {
+        setInterval(function (left, bottom) {
+            if (direction === 'west' && x > 0) {
                 x = x - 1
             }
-            if (direction === 'north') {
+            if (direction === 'north' && y < window.innerHeight-75) {
                 y = y + 1
             }
-            if (direction === 'east') {
+            if (direction === 'east' && x < window.innerWidth-50) {
                 x = x + 1
             }
-            if (direction === 'south') {
+            if (direction === 'south' && y > 0) {
                 y = y - 1
             }
             element.style.left = x + 'px'
             element.style.bottom = y + 'px'
+
+            characterVerticalPosition = element.style.bottom
+
         }, 1)
 
         document.addEventListener('keydown', function (e) {
@@ -46,12 +60,16 @@ function move(element) {
             if (e.key === 'ArrowDown') {
                 direction = 'south'
             }
-            callback(direction)
+            if (callback !== undefined) {
+                callback(direction)
+            }
         })
 
         document.addEventListener('keyup', function (e) {
             direction = null
-            callback(direction)
+            if (callback !== undefined) {
+                callback(direction)
+            }
         })
     }
 
@@ -60,4 +78,3 @@ function move(element) {
         withArrowKeys: moveWithArrowKeys
     }
 }
-
